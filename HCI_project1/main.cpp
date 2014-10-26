@@ -94,14 +94,14 @@ void waitForPalmCover(MyImage* m){
 		for (int j = 0; j<NSAMPLES; j++){
 			roi[j].draw_rectangle(m->src);
 		}
-		string imgText = string("Cover rectangles with palm");
-		printText(m->src, imgText);
+		//string imgText = string("Cover rectangles with palm");
+		//printText(m->src, imgText);
 
 		if (i == 30){
 			//	imwrite("./images/waitforpalm1.jpg",m->src);
 		}
 
-		imshow("img1", m->src);
+		imshow("user", m->src);
 		out << m->src;
 		if (cv::waitKey(30) >= 0) break;
 	}
@@ -152,9 +152,9 @@ void average(MyImage *m){
 			roi[j].draw_rectangle(m->src);
 		}
 		cvtColor(m->src, m->src, COL2ORIGCOL);
-		string imgText = string("Finding average color of hand");
-		printText(m->src, imgText);
-		imshow("img1", m->src);
+		//string imgText = string("Finding average color of hand");
+		//printText(m->src, imgText);
+		imshow("user", m->src);
 		if (cv::waitKey(30) >= 0) break;
 	}
 }
@@ -227,7 +227,7 @@ void produceBinaries(MyImage *m){
 
 void initWindows(MyImage m){
 	//namedWindow("trackbars", CV_WINDOW_KEEPRATIO);
-	namedWindow("img1", CV_WINDOW_KEEPRATIO);
+	namedWindow("user", CV_WINDOW_KEEPRATIO);
 }
 
 void showWindows(MyImage m){
@@ -240,7 +240,7 @@ void showWindows(MyImage m){
 		channels.push_back(m.bw);
 	merge(channels, result);
 	result.copyTo(m.src(roi));
-	imshow("img1", m.src);
+	imshow("user", m.src);
 
 	// ready to play
 	//gameFlag = 0;
@@ -377,6 +377,56 @@ void overlayImage(const cv::Mat &background, const cv::Mat &foreground,
 	}
 }
 
+void overlayImage2(const cv::Mat &background, const cv::Mat &foreground,
+	cv::Mat &output)
+{
+	Point2i location = Point(0, 0);
+	background.copyTo(output);
+
+
+	// start at the row indicated by location, or at row 0 if location.y is negative.
+	for (int y = max(location.y, 0); y < background.rows; ++y)
+	{
+		int fY = y - location.y; // because of the translation
+
+		// we are done of we have processed all rows of the foreground image.
+		if (fY >= foreground.rows)
+			break;
+
+		// start at the column indicated by location, 
+
+		// or at column 0 if location.x is negative.
+		for (int x = max(location.x, 0); x < background.cols; ++x)
+		{
+			int fX = x - location.x; // because of the translation.
+
+			// we are done with this row if the column is outside of the foreground image.
+			if (fX >= foreground.cols)
+				break;
+
+			// determine the opacity of the foregrond pixel, using its fourth (alpha) channel.
+			double opacity =
+				((double)foreground.data[fY * foreground.step + fX * foreground.channels() + 3])
+
+				/ 255.;
+
+
+			// and now combine the background and foreground pixel, using the opacity, 
+
+			// but only if opacity > 0.
+			for (int c = 0; opacity > 0 && c < output.channels(); ++c)
+			{
+				unsigned char foregroundPx =
+					foreground.data[fY * foreground.step + fX * foreground.channels() + c];
+				unsigned char backgroundPx =
+					background.data[y * background.step + x * background.channels() + c];
+				output.data[y*output.step + output.channels()*x + c] =
+					backgroundPx * (1. - opacity) + foregroundPx * opacity;
+			}
+		}
+	}
+}
+
 int main(){
 
 	namedWindow("Rock-Paper-Scissor", WINDOW_AUTOSIZE);
@@ -391,11 +441,12 @@ int main(){
 	HandGesture hg;
 	init(&m);
 	m.cap >> m.src;
-	namedWindow("img1", CV_WINDOW_KEEPRATIO);
-	moveWindow("img1", 50, 380);
-	resizeWindow("img1", 400, 300);
+	namedWindow("user", CV_WINDOW_KEEPRATIO);
+	moveWindow("user", 50, 380);
+	resizeWindow("user", 400, 300);
 	out.open("out.avi", CV_FOURCC('M', 'J', 'P', 'G'), 15, m.src.size(), true);
 	PlaySound(TEXT("s_hand.wav"), NULL, SND_SYNC);
+	PlaySound(TEXT("s_square.wav"), NULL, SND_SYNC);
 	waitForPalmCover(&m);
 	average(&m);
 	//destroyWindow("img1");
@@ -469,7 +520,7 @@ int main(){
 			// get the result
 			result_com = rand() % 3;
 			detect_result = hg.fin_num;
-			cout << "detection result: " << hg.fin_num << endl;
+			//cout << "detection result: " << hg.fin_num << endl;
 			if (detect_result < 2)
 				result_user = 1;
 			else if (detect_result > 2)
@@ -477,9 +528,9 @@ int main(){
 			else
 				result_user = 2;
 
-			//cout << "imshow" << endl;
-			//cout << "computer: " << result_com << endl;
-			//cout << "user: " << result_user << endl;
+			cout << "imshow" << endl;
+			cout << "computer: " << result_com << endl;
+			cout << "user: " << result_user << endl;
 			temp_com = result_com;
 			temp_user = result_user;
 
@@ -488,7 +539,7 @@ int main(){
 				if (result_user == 0){ //paper
 					//overlayImage(board, paper, result, cv::Point(80, 60));
 					//overlayImage(result, paper, result, cv::Point(480, 60));
-					overlayImage(board, pp, result, Point(0, 0));
+					overlayImage2(board, pp, result);
 					imshow("Rock-Paper-Scissor", result);
 					waitKey(1);
 					//PlaySound(TEXT("s_again.wav"), NULL, SND_SYNC);
@@ -496,7 +547,7 @@ int main(){
 				else if (result_user == 1){ //rock
 					//overlayImage(board, paper, result, cv::Point(80, 60));
 					//overlayImage(result, rock, result, cv::Point(480, 50));
-					overlayImage(board, pr, result, Point(0, 0));
+					overlayImage2(board, pr, result);
 					imshow("Rock-Paper-Scissor", result);
 					waitKey(1);
 					//PlaySound(TEXT("s_win.wav"), NULL, SND_SYNC);
@@ -504,7 +555,7 @@ int main(){
 				else{ //scissor
 					//overlayImage(board, paper, result, cv::Point(80, 60));
 					//overlayImage(result, scissor, result, cv::Point(490, 50));
-					overlayImage(board, ps, result, Point(0, 0));
+					overlayImage2(board, ps, result);
 					imshow("Rock-Paper-Scissor", result);
 					waitKey(1);
 					//PlaySound(TEXT("s_sad.wav"), NULL, SND_SYNC);
@@ -514,7 +565,7 @@ int main(){
 				if (result_user == 0){ // paper
 					//overlayImage(board, rock, result, cv::Point(80, 50));
 					//overlayImage(result, paper, result, cv::Point(480, 60));
-					overlayImage(board, rp, result, Point(0, 0));
+					overlayImage2(board, rp, result);
 					imshow("Rock-Paper-Scissor", result);
 					waitKey(1);
 					//PlaySound(TEXT("s_sad.wav"), NULL, SND_SYNC);
@@ -522,7 +573,7 @@ int main(){
 				else if (result_user == 1){ // rock
 					//overlayImage(board, rock, result, cv::Point(80, 50));
 					//overlayImage(result, rock, result, cv::Point(480, 50));
-					overlayImage(board, rr, result, Point(0, 0));
+					overlayImage2(board, rr, result);
 					imshow("Rock-Paper-Scissor", result);
 					waitKey(1);
 					//PlaySound(TEXT("s_again.wav"), NULL, SND_SYNC);
@@ -530,7 +581,7 @@ int main(){
 				else{ // scissor
 					//overlayImage(board, rock, result, cv::Point(80, 50));
 					//overlayImage(result, scissor, result, cv::Point(490, 50));
-					overlayImage(board, rs, result, Point(0, 0));
+					overlayImage2(board, rs, result);
 					imshow("Rock-Paper-Scissor", result);
 					waitKey(1);
 					//PlaySound(TEXT("s_win.wav"), NULL, SND_SYNC);
@@ -540,7 +591,7 @@ int main(){
 				if (result_user == 0){ // paper
 					//overlayImage(board, scissor, result, cv::Point(90, 50));
 					//overlayImage(result, paper, result, cv::Point(480, 60));
-					overlayImage(board, sp, result, Point(0, 0));
+					overlayImage2(board, sp, result);
 					imshow("Rock-Paper-Scissor", result);
 					waitKey(1);
 					//PlaySound(TEXT("s_win.wav"), NULL, SND_SYNC);
@@ -548,7 +599,7 @@ int main(){
 				else if (result_user == 1){ // rock
 					//overlayImage(board, scissor, result, cv::Point(90, 50));
 					//overlayImage(result, rock, result, cv::Point(480, 50));
-					overlayImage(board, sr, result, Point(0, 0));
+					overlayImage2(board, sr, result);
 					imshow("Rock-Paper-Scissor", result);
 					waitKey(1);
 					//PlaySound(TEXT("s_sad.wav"), NULL, SND_SYNC);
@@ -556,7 +607,7 @@ int main(){
 				else{ // scissor
 					//overlayImage(board, scissor, result, cv::Point(90, 50));
 					//overlayImage(result, scissor, result, cv::Point(490, 50));
-					overlayImage(board, ss, result, Point(0, 0));
+					overlayImage2(board, ss, result);
 					imshow("Rock-Paper-Scissor", result);
 					waitKey(1);
 					//PlaySound(TEXT("s_again.wav"), NULL, SND_SYNC);
@@ -564,7 +615,7 @@ int main(){
 			}
 		}
 		// play the feedback
-		else if (count == 10){
+		if (count == 10){
 
 			//cout << "play" << endl;
 			//cout << "computer: " << temp_com << endl;
@@ -621,7 +672,7 @@ int main(){
 		}
 
 	}
-	destroyAllWindows();
+	//destroyAllWindows();
 	out.release();
 	m.cap.release();
 	return 0;
