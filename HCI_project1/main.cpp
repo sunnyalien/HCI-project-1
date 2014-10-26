@@ -67,6 +67,8 @@ void printText(Mat src, string text){
 void waitForPalmCover(MyImage* m){
 	m->cap >> m->src;
 	flip(m->src, m->src, 1);
+
+		
 	roi.push_back(My_ROI(Point(m->src.cols / 3, m->src.rows / 6), Point(m->src.cols / 3 + square_len, m->src.rows / 6 + square_len), m->src));
 	roi.push_back(My_ROI(Point(m->src.cols / 4, m->src.rows / 2), Point(m->src.cols / 4 + square_len, m->src.rows / 2 + square_len), m->src));
 	roi.push_back(My_ROI(Point(m->src.cols / 3, m->src.rows / 1.5), Point(m->src.cols / 3 + square_len, m->src.rows / 1.5 + square_len), m->src));
@@ -76,9 +78,19 @@ void waitForPalmCover(MyImage* m){
 	roi.push_back(My_ROI(Point(m->src.cols / 2.5, m->src.rows / 1.8), Point(m->src.cols / 2.5 + square_len, m->src.rows / 1.8 + square_len), m->src));
 
 
-	for (int i = 0; i<50; i++){
+	//roi.push_back(My_ROI(Point(m->src.cols / 2, m->src.rows / 3), Point(m->src.cols / 2 + square_len, m->src.rows / 3 + square_len), m->src));
+	//roi.push_back(My_ROI(Point(m->src.cols / 3, m->src.rows / 2.5), Point(m->src.cols / 3 + square_len, m->src.rows / 2.5 + square_len), m->src));
+	//roi.push_back(My_ROI(Point(m->src.cols / 3, m->src.rows / 2), Point(m->src.cols / 3 + square_len, m->src.rows / 2 + square_len), m->src));
+	//roi.push_back(My_ROI(Point(m->src.cols / 2, m->src.rows / 2), Point(m->src.cols / 2 + square_len, m->src.rows / 2 + square_len), m->src));
+	//roi.push_back(My_ROI(Point(m->src.cols / 1.5, m->src.rows / 2), Point(m->src.cols / 1.5 + square_len, m->src.rows / 2 + square_len), m->src));
+	//roi.push_back(My_ROI(Point(m->src.cols / 3, m->src.rows / 1.8), Point(m->src.cols / 3 + square_len, m->src.rows / 1.8 + square_len), m->src));
+	//roi.push_back(My_ROI(Point(m->src.cols / 2, m->src.rows / 1.5), Point(m->src.cols / 2 + square_len, m->src.rows / 1.5 + square_len), m->src));
+
+
+	for (int i = 0; i<100; i++){
 		m->cap >> m->src;
 		flip(m->src, m->src, 1);
+
 		for (int j = 0; j<NSAMPLES; j++){
 			roi[j].draw_rectangle(m->src);
 		}
@@ -383,6 +395,7 @@ int main(){
 	moveWindow("img1", 50, 380);
 	resizeWindow("img1", 400, 300);
 	out.open("out.avi", CV_FOURCC('M', 'J', 'P', 'G'), 15, m.src.size(), true);
+	PlaySound(TEXT("s_hand.wav"), NULL, SND_SYNC);
 	waitForPalmCover(&m);
 	average(&m);
 	//destroyWindow("img1");
@@ -415,6 +428,7 @@ int main(){
 	initTrackbars();
 	int count = 0;
 	int countCycle = 1;
+	PlaySound(TEXT("s_start.wav"), NULL, SND_SYNC);
 	for (;;){	// cycle = 20 frame
 		hg.frameNumber++;
 		// count for number of frame
@@ -550,7 +564,7 @@ int main(){
 			}
 		}
 		// play the feedback
-		else if (count == 6){
+		else if (count == 10){
 
 			//cout << "play" << endl;
 			//cout << "computer: " << temp_com << endl;
@@ -591,7 +605,7 @@ int main(){
 			}
 
 		}
-		else if (count == 8){
+		else if (count == 20){
 
 			if (countCycle == 5){
 				//Key = waitKey();
