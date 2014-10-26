@@ -371,6 +371,9 @@ int main(){
 	moveWindow("Rock-Paper-Scissor", 500, 80);
 	Mat cover = imread("cover3.jpg");
 	imshow("Rock-Paper-Scissor", cover);
+	waitKey(1);
+	PlaySound(TEXT("s_ini.wav"), NULL, SND_SYNC);
+
 
 	MyImage m(0);
 	HandGesture hg;
@@ -383,7 +386,7 @@ int main(){
 	waitForPalmCover(&m);
 	average(&m);
 	//destroyWindow("img1");
-
+	
 
 
 	Mat board = imread("board.jpg");
@@ -406,17 +409,18 @@ int main(){
 	int detect_result = 0;
 	int temp_com = 0;
 	int temp_user = 0;
-
+	char Key;
 
 	//initWindows(m);
 	initTrackbars();
 	int count = 0;
+	int countCycle = 1;
 	for (;;){	// cycle = 20 frame
 		hg.frameNumber++;
 		// count for number of frame
 		count++;
 
-		cout << count << endl;
+		//cout << count << endl;
 		if (count == 1){
 			//cout << "start" << endl;
 			PlaySound(TEXT("s_RockPaperScissor.wav"), NULL, SND_SYNC);
@@ -438,13 +442,15 @@ int main(){
 		cvtColor(m.srcLR, m.srcLR, COL2ORIGCOL);
 		makeContours(&m, &hg);
 		hg.getFingerNumber(&m);
-		showWindows(m);
-		out << m.src;
+		
+		//out << m.src;
 		//imwrite("result.jpg", m.src);
 		//if (cv::waitKey(30) == char('q')) break;
 
 
 		if (count == 5){
+
+			showWindows(m);
 
 			// get the result
 			result_com = rand() % 3;
@@ -543,50 +549,61 @@ int main(){
 				}
 			}
 		}
-		//// play the feedback
-		//else if (count == 5){
-
-		//	//cout << "play" << endl;
-		//	//cout << "computer: " << temp_com << endl;
-		//	//cout << "user: " << temp_user << endl;
-
-		//	if (temp_com == 0){ //paper
-		//		if (temp_user == 0){ //paper
-		//			PlaySound(TEXT("s_again.wav"), NULL, SND_SYNC);
-		//		}
-		//		else if (temp_user == 1){ //rock
-		//			PlaySound(TEXT("s_win.wav"), NULL, SND_SYNC);
-		//		}
-		//		else{ //scissor
-		//			PlaySound(TEXT("s_sad.wav"), NULL, SND_SYNC);
-		//		}
-		//	}
-		//	else if (temp_com == 1){ // rock
-		//		if (temp_user == 0){ // paper
-		//			PlaySound(TEXT("s_sad.wav"), NULL, SND_SYNC);
-		//		}
-		//		else if (temp_user == 1){ // rock
-		//			PlaySound(TEXT("s_again.wav"), NULL, SND_SYNC);
-		//		}
-		//		else{ // scissor
-		//			PlaySound(TEXT("s_win.wav"), NULL, SND_SYNC);
-		//		}
-		//	}
-		//	else { // scissor
-		//		if (temp_user == 0){ // paper
-		//			PlaySound(TEXT("s_win.wav"), NULL, SND_SYNC);
-		//		}
-		//		else if (temp_user == 1){ // rock
-		//			PlaySound(TEXT("s_sad.wav"), NULL, SND_SYNC);
-		//		}
-		//		else{ // scissor
-		//			PlaySound(TEXT("s_again.wav"), NULL, SND_SYNC);
-		//		}
-		//	}
-
-		//}
+		// play the feedback
 		else if (count == 6){
+
+			//cout << "play" << endl;
+			//cout << "computer: " << temp_com << endl;
+			//cout << "user: " << temp_user << endl;
+
+			if (temp_com == 0){ //paper
+				if (temp_user == 0){ //paper
+					PlaySound(TEXT("s_again.wav"), NULL, SND_SYNC);
+				}
+				else if (temp_user == 1){ //rock
+					PlaySound(TEXT("s_win.wav"), NULL, SND_SYNC);
+				}
+				else{ //scissor
+					PlaySound(TEXT("s_sad.wav"), NULL, SND_SYNC);
+				}
+			}
+			else if (temp_com == 1){ // rock
+				if (temp_user == 0){ // paper
+					PlaySound(TEXT("s_sad.wav"), NULL, SND_SYNC);
+				}
+				else if (temp_user == 1){ // rock
+					PlaySound(TEXT("s_again.wav"), NULL, SND_SYNC);
+				}
+				else{ // scissor
+					PlaySound(TEXT("s_win.wav"), NULL, SND_SYNC);
+				}
+			}
+			else { // scissor
+				if (temp_user == 0){ // paper
+					PlaySound(TEXT("s_win.wav"), NULL, SND_SYNC);
+				}
+				else if (temp_user == 1){ // rock
+					PlaySound(TEXT("s_sad.wav"), NULL, SND_SYNC);
+				}
+				else{ // scissor
+					PlaySound(TEXT("s_again.wav"), NULL, SND_SYNC);
+				}
+			}
+
+		}
+		else if (count == 8){
+
+			if (countCycle == 5){
+				//Key = waitKey();
+				//if (Key == '1'){
+					PlaySound(TEXT("s_end.wav"), NULL, SND_SYNC);
+					break;
+				//}
+			}
+			
 			count = 0;
+			countCycle++;
+
 		}
 
 	}
