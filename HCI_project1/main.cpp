@@ -427,6 +427,14 @@ void overlayImage2(const cv::Mat &background, const cv::Mat &foreground,
 	}
 }
 
+string int2str(int &i) {
+	string s;
+	stringstream ss(s);
+	ss << i;
+	
+	return ss.str();
+}
+
 int main(){
 
 	namedWindow("Rock-Paper-Scissor", WINDOW_AUTOSIZE);
@@ -449,9 +457,8 @@ int main(){
 	PlaySound(TEXT("s_square.wav"), NULL, SND_SYNC);
 	waitForPalmCover(&m);
 	average(&m);
-	//destroyWindow("img1");
+	destroyWindow("user");
 	
-
 
 	Mat board = imread("board.jpg");
 	Mat paper = imread("paper.jpg");
@@ -474,6 +481,14 @@ int main(){
 	int temp_com = 0;
 	int temp_user = 0;
 	char Key;
+	int game_result = 0;
+	int score_com = 0;
+	int score_user = 0;
+	int fontFace = FONT_HERSHEY_SCRIPT_SIMPLEX;
+	double fontScale = 3;
+	int thickness = 6;
+	int score_top = 3;
+	
 
 	//initWindows(m);
 	initTrackbars();
@@ -492,13 +507,7 @@ int main(){
 			//cout << "end" << endl;
 		}
 
-		
-
-
-
 		m.cap >> m.src;
-
-
 		flip(m.src, m.src, 1);
 		pyrDown(m.src, m.srcLR);
 		blur(m.srcLR, m.srcLR, Size(3, 3));
@@ -515,8 +524,6 @@ int main(){
 
 		if (count == 5){
 
-			showWindows(m);
-
 			// get the result
 			result_com = rand() % 3;
 			detect_result = hg.fin_num;
@@ -528,18 +535,21 @@ int main(){
 			else
 				result_user = 2;
 
-			cout << "imshow" << endl;
-			cout << "computer: " << result_com << endl;
-			cout << "user: " << result_user << endl;
+			//cout << "imshow" << endl;
+			//cout << "computer: " << result_com << endl;
+			//cout << "user: " << result_user << endl;
 			temp_com = result_com;
 			temp_user = result_user;
 
+			//showWindows(m);
 
 			if (result_com == 0){ //paper
 				if (result_user == 0){ //paper
 					//overlayImage(board, paper, result, cv::Point(80, 60));
 					//overlayImage(result, paper, result, cv::Point(480, 60));
 					overlayImage2(board, pp, result);
+					putText(result, int2str(score_com), Point(40, 430), fontFace, fontScale, Scalar(0, 0, 200), thickness);
+					putText(result, int2str(score_user), Point(700, 430), fontFace, fontScale, Scalar(0, 0, 200), thickness);
 					imshow("Rock-Paper-Scissor", result);
 					waitKey(1);
 					//PlaySound(TEXT("s_again.wav"), NULL, SND_SYNC);
@@ -548,16 +558,24 @@ int main(){
 					//overlayImage(board, paper, result, cv::Point(80, 60));
 					//overlayImage(result, rock, result, cv::Point(480, 50));
 					overlayImage2(board, pr, result);
+					score_com++;
+					putText(result, int2str(score_com), Point(40, 430), fontFace, fontScale, Scalar(0, 0, 200), thickness);
+					putText(result, int2str(score_user), Point(700, 430), fontFace, fontScale, Scalar(0, 0, 200), thickness);
 					imshow("Rock-Paper-Scissor", result);
 					waitKey(1);
+					//game_result--;
 					//PlaySound(TEXT("s_win.wav"), NULL, SND_SYNC);
 				}
 				else{ //scissor
 					//overlayImage(board, paper, result, cv::Point(80, 60));
 					//overlayImage(result, scissor, result, cv::Point(490, 50));
 					overlayImage2(board, ps, result);
+					score_user++;
+					putText(result, int2str(score_com), Point(40, 430), fontFace, fontScale, Scalar(0, 0, 200), thickness);
+					putText(result, int2str(score_user), Point(700, 430), fontFace, fontScale, Scalar(0, 0, 200), thickness);
 					imshow("Rock-Paper-Scissor", result);
 					waitKey(1);
+					//game_result++;
 					//PlaySound(TEXT("s_sad.wav"), NULL, SND_SYNC);
 				}
 			}
@@ -566,14 +584,20 @@ int main(){
 					//overlayImage(board, rock, result, cv::Point(80, 50));
 					//overlayImage(result, paper, result, cv::Point(480, 60));
 					overlayImage2(board, rp, result);
+					score_user++;
+					putText(result, int2str(score_com), Point(40, 430), fontFace, fontScale, Scalar(0, 0, 200), thickness);
+					putText(result, int2str(score_user), Point(700, 430), fontFace, fontScale, Scalar(0, 0, 200), thickness);
 					imshow("Rock-Paper-Scissor", result);
 					waitKey(1);
+					//game_result++;
 					//PlaySound(TEXT("s_sad.wav"), NULL, SND_SYNC);
 				}
 				else if (result_user == 1){ // rock
 					//overlayImage(board, rock, result, cv::Point(80, 50));
 					//overlayImage(result, rock, result, cv::Point(480, 50));
 					overlayImage2(board, rr, result);
+					putText(result, int2str(score_com), Point(40, 430), fontFace, fontScale, Scalar(0, 0, 200), thickness);
+					putText(result, int2str(score_user), Point(700, 430), fontFace, fontScale, Scalar(0, 0, 200), thickness);
 					imshow("Rock-Paper-Scissor", result);
 					waitKey(1);
 					//PlaySound(TEXT("s_again.wav"), NULL, SND_SYNC);
@@ -582,8 +606,12 @@ int main(){
 					//overlayImage(board, rock, result, cv::Point(80, 50));
 					//overlayImage(result, scissor, result, cv::Point(490, 50));
 					overlayImage2(board, rs, result);
+					score_com++;
+					putText(result, int2str(score_com), Point(40, 430), fontFace, fontScale, Scalar(0, 0, 200), thickness);
+					putText(result, int2str(score_user), Point(700, 430), fontFace, fontScale, Scalar(0, 0, 200), thickness);
 					imshow("Rock-Paper-Scissor", result);
 					waitKey(1);
+					//game_result--;
 					//PlaySound(TEXT("s_win.wav"), NULL, SND_SYNC);
 				}
 			}
@@ -592,30 +620,42 @@ int main(){
 					//overlayImage(board, scissor, result, cv::Point(90, 50));
 					//overlayImage(result, paper, result, cv::Point(480, 60));
 					overlayImage2(board, sp, result);
+					score_com++;
+					putText(result, int2str(score_com), Point(40, 430), fontFace, fontScale, Scalar(0, 0, 200), thickness);
+					putText(result, int2str(score_user), Point(700, 430), fontFace, fontScale, Scalar(0, 0, 200), thickness);
 					imshow("Rock-Paper-Scissor", result);
 					waitKey(1);
+					//game_result--;
 					//PlaySound(TEXT("s_win.wav"), NULL, SND_SYNC);
 				}
 				else if (result_user == 1){ // rock
 					//overlayImage(board, scissor, result, cv::Point(90, 50));
 					//overlayImage(result, rock, result, cv::Point(480, 50));
 					overlayImage2(board, sr, result);
+					score_user++;
+					putText(result, int2str(score_com), Point(40, 430), fontFace, fontScale, Scalar(0, 0, 200), thickness);
+					putText(result, int2str(score_user), Point(700, 430), fontFace, fontScale, Scalar(0, 0, 200), thickness);
 					imshow("Rock-Paper-Scissor", result);
 					waitKey(1);
+					//game_result++;
 					//PlaySound(TEXT("s_sad.wav"), NULL, SND_SYNC);
 				}
 				else{ // scissor
 					//overlayImage(board, scissor, result, cv::Point(90, 50));
 					//overlayImage(result, scissor, result, cv::Point(490, 50));
 					overlayImage2(board, ss, result);
+					putText(result, int2str(score_com), Point(40, 430), fontFace, fontScale, Scalar(0, 0, 200), thickness);
+					putText(result, int2str(score_user), Point(700, 430), fontFace, fontScale, Scalar(0, 0, 200), thickness);
 					imshow("Rock-Paper-Scissor", result);
 					waitKey(1);
 					//PlaySound(TEXT("s_again.wav"), NULL, SND_SYNC);
 				}
 			}
+			//showWindows(m);
+			//cout << "game result " << game_result << endl;
 		}
 		// play the feedback
-		if (count == 10){
+		if (count == 6){
 
 			//cout << "play" << endl;
 			//cout << "computer: " << temp_com << endl;
@@ -656,18 +696,19 @@ int main(){
 			}
 
 		}
-		else if (count == 20){
+		else if (count == 7){
 
-			if (countCycle == 5){
-				//Key = waitKey();
-				//if (Key == '1'){
-					PlaySound(TEXT("s_end.wav"), NULL, SND_SYNC);
-					break;
-				//}
+			if (score_com == score_top){
+				PlaySound(TEXT("s_end3.wav"), NULL, SND_SYNC);
+				break;
+			}
+			else if (score_user == score_top){
+				PlaySound(TEXT("s_end1.wav"), NULL, SND_SYNC);
+				break;
 			}
 			
 			count = 0;
-			countCycle++;
+			//countCycle++;
 
 		}
 
