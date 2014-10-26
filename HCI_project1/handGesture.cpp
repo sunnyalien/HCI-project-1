@@ -152,10 +152,12 @@ void HandGesture::addNumberToImg(MyImage *m){
 // over 20 frames
 void HandGesture::getFingerNumber(MyImage *m){
 	removeRedundantFingerTips();
-	if(bRect.height > m->src.rows/2 && nrNoFinger>12 && isHand ){
+	// 12 -> 3
+	if(bRect.height > m->src.rows/2 && nrNoFinger>3 && isHand ){
 		numberColor=Scalar(0,200,0);
 		addFingerNumberToVector();
-		if(frameNumber>12){
+		// 12 -> 3
+		if(frameNumber>3){
 			nrNoFinger=0;
 			frameNumber=0;	
 			computeFingerNumber();	
