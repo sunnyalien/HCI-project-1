@@ -457,7 +457,7 @@ int main(){
 	PlaySound(TEXT("s_square.wav"), NULL, SND_SYNC);
 	waitForPalmCover(&m);
 	average(&m);
-	destroyWindow("user");
+	//destroyWindow("user");
 	
 
 	Mat board = imread("board.jpg");
@@ -487,7 +487,7 @@ int main(){
 	int fontFace = FONT_HERSHEY_SCRIPT_SIMPLEX;
 	double fontScale = 3;
 	int thickness = 6;
-	int score_top = 3;
+	int score_top = 5;
 	
 
 	//initWindows(m);
@@ -522,7 +522,7 @@ int main(){
 		//if (cv::waitKey(30) == char('q')) break;
 
 
-		if (count == 5){
+		if (count == 6){
 
 			// get the result
 			result_com = rand() % 3;
@@ -541,7 +541,7 @@ int main(){
 			temp_com = result_com;
 			temp_user = result_user;
 
-			//showWindows(m);
+			showWindows(m);
 
 			if (result_com == 0){ //paper
 				if (result_user == 0){ //paper
@@ -655,7 +655,7 @@ int main(){
 			//cout << "game result " << game_result << endl;
 		}
 		// play the feedback
-		if (count == 6){
+		if (count == 8){
 
 			//cout << "play" << endl;
 			//cout << "computer: " << temp_com << endl;
@@ -696,7 +696,7 @@ int main(){
 			}
 
 		}
-		else if (count == 7){
+		else if (count == 10){
 
 			if (score_com == score_top){
 				PlaySound(TEXT("s_end3.wav"), NULL, SND_SYNC);
